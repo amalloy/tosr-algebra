@@ -7,23 +7,23 @@ clueless :: Knowledge
 impossible :: Knowledge
 combine :: Knowledge -> Knowledge -> Knowledge
 
-law: "combine/commutative"
+law: "knowledge/commutative"
   forall (a :: Knowledge) (b :: Knowledge).
   combine a b = combine b a
 
-law: "combine/associative"
+law: "knowledge/associative"
   forall (a :: Knowledge) (b :: Knowledge) (c :: Knowledge).
   combine (combine a b) c = combine a (combine b c)
 
-law: "combine/clueless"
+law: "knowledge/clueless"
   forall (a :: Knowledge)
   combine a clueless = a
 
-law: "combine/impossible"
+law: "knowledge/impossible"
   forall (a :: Knowledge)
   combine a impossible = impossible
 
-law: "combine/redundant"
+law: "knowledge/redundant"
   forall (a :: Knowledge)
   combine a a = a
 
@@ -100,14 +100,14 @@ forall (a :: Int).
 data Suit
 has :: Range -> Suit -> Knowledge
 
-law: "has/invalid/impossible"
+law: "range/invalid/impossible"
 forall (s :: Suit).
   has invalid s = impossible
 
-law: "has/unlimited/clueless"
+law: "range/unlimited/clueless"
 forall (s :: Suit).
   has unlimited s = clueless
 
 law: "has/combine/tighten"
 forall (s :: Suit) (r1, r2 :: Range)
-combine (has r1 s) (has r2 s) = has (tighten r1 r2) s
+  combine (has r1 s) (has r2 s) = has (tighten r1 r2) s
