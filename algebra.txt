@@ -111,3 +111,10 @@ forall (s :: Suit).
 law: "has/combine/tighten"
 forall (s :: Suit) (r1, r2 :: Range)
   combine (has r1 s) (has r2 s) = has (tighten r1 r2) s
+
+-- embed some knowledge into all continuations
+learn :: Knowledge -> RelaySystem -> RelaySystem
+
+law: "learn/meaning"
+forall (k :: Knowledge) (bids :: [Bid]) (sys :: RelaySystem).
+  meaning (learn k sys) bids = combine k (meaning sys bids)
