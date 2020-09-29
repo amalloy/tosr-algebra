@@ -7,7 +7,7 @@ clueless :: Knowledge
 impossible :: Knowledge
 combine :: Knowledge -> Knowledge -> Knowledge
 
-law: "combine/commutatibe"
+law: "combine/commutative"
   forall (a :: Knowledge) (b :: Knowledge).
   combine a b = combine b a
 
@@ -22,3 +22,20 @@ law: "combine/clueless"
 law: "combine/impossible"
   forall (a :: Knowledge)
   combine a impossible = impossible
+
+law: "combine/redundant"
+  forall (a :: Knowledge)
+  combine a a = a
+
+data Suit
+exactly, atLeast, atMost :: Int -> Suit -> Knowledge
+
+law: "combine/exactly/impossible"
+forall (s :: Suit) (len1 :: Int) (len2 :: Int).
+  len1 /= len2 =>
+    combine (exactly len1 s) (exactly len2 s) = impossible
+
+law: "combine/atLeast/atMost/impossible"
+forall (s1 :: Suit) (min :: Int) (max :: Int).
+  min > max =>
+    combine (atLeast min s) (atMost max s) = impossible
