@@ -1,0 +1,24 @@
+data RelaySystem
+data Bid
+data Knowledge
+
+meaning :: RelaySystem -> [Bid] -> Knowledge
+clueless :: Knowledge
+impossible :: Knowledge
+combine :: Knowledge -> Knowledge -> Knowledge
+
+law: "combine/commutatibe"
+  forall (a :: Knowledge) (b :: Knowledge).
+  combine a b = combine b a
+
+law: "combine/associative"
+  forall (a :: Knowledge) (b :: Knowledge) (c :: Knowledge).
+  combine (combine a b) c = combine a (combine b c)
+
+law: "combine/clueless"
+  forall (a :: Knowledge)
+  combine a clueless = a
+
+law: "combine/impossible"
+  forall (a :: Knowledge)
+  combine a impossible = impossible
