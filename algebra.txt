@@ -2,7 +2,12 @@ data RelaySystem
 data Bid
 data Knowledge
 
+-- our observation: "please describe the auction"
 meaning :: RelaySystem -> [Bid] -> Knowledge
+
+-- the legal next steps from a given auction state
+auction :: RelaySystem -> [RelaySystem]
+
 clueless :: Knowledge
 impossible :: Knowledge
 combine :: Knowledge -> Knowledge -> Knowledge
