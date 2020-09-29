@@ -27,15 +27,87 @@ law: "combine/redundant"
   forall (a :: Knowledge)
   combine a a = a
 
-data Suit
-exactly, atLeast, atMost :: Int -> Suit -> Knowledge
+data Range
+unlimited :: Range
+invalidRange :: Range
+exactly, atLeast, atMost :: Int -> Range
+tighten :: Range -> Range -> Range
 
-law: "combine/exactly/impossible"
-forall (s :: Suit) (len1 :: Int) (len2 :: Int).
+law: "tighten/redundant"
+forall (r :: Range).
+  tighten r r = r
+
+law: "tighten/invalid"
+forall (r :: Range).
+  tighten r invalid = invalid
+
+law: "tighten/unlimited"
+forall (r :: Range).
+  tighten r unlimited = r
+
+law: "tighten/commutative"
+forall (r :: Range) (s :: Range).
+  tighten r s = tighten s r
+
+law: "tighten/associative"
+forall (r, s, t :: Range)
+  tighten r (tighten s t) = tighten (tighten r s) t
+
+law: "tighten/exactly/invalid"
+forall (len1 :: Int) (len2 :: Int).
   len1 /= len2 =>
-    combine (exactly len1 s) (exactly len2 s) = impossible
+    tighten (exactly len1) (exactly len2) = invalid
 
-law: "combine/atLeast/atMost/impossible"
-forall (s1 :: Suit) (min :: Int) (max :: Int).
+law: "tighten/atLeast/atMost/invalid"
+forall (min :: Int) (max :: Int).
   min > max =>
-    combine (atLeast min s) (atMost max s) = impossible
+    tighten (atLeast min) (atMost max) = invalid
+
+law: "tighten/atLeast/dominates"
+forall (a, b :: Int).
+  a >= b =>
+    tighten (atLeast a) (atLeast b) = atLeast a
+
+law: "tighten/atMost/dominates"
+forall (a, b :: Int).
+  a <= b =>
+    tighten (atMost a) (atMost b) = atMost a
+
+law: "tighten/exactly/atLeast/dominates"
+forall (a, b :: Int).
+  a >= b =>
+    tighten (exactly a) (atLeast b) = exactly a
+
+law: "tighten/exactly/atLeast/invalid"
+forall (a, b :: Int).
+  a < b =>
+    tighten (exactly a) (atLeast b) = invalid
+
+law: "tighten/exactly/atMost/dominates"
+forall (a, b :: Int).
+  a <= b =>
+    tighten (exactly a) (atMost b) = exactly a
+
+law: "tighten/exactly/atMost/invalid"
+forall (a, b :: Int).
+  a > b =>
+    tighten (exactly a) (atMost b) = invalid
+
+law: "tighten/atLeast/atMost/exactly"
+forall (a :: Int).
+  tighten (atLeast a) (atMost a) = exactly a
+
+data Suit
+has :: Range -> Suit -> Knowledge
+
+law: "has/invalid/impossible"
+forall (s :: Suit).
+  has invalid s = impossible
+
+law: "has/unlimited/clueless"
+forall (s :: Suit).
+  has unlimited s = clueless
+
+law: "has/combine/tighten"
+forall (s :: Suit) (r1, r2 :: Range)
+combine (has r1 s) (has r2 s) = has (tighten r1 r2) s
