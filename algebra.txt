@@ -142,3 +142,28 @@ puppetStayman = ask cheapest `thenAnswerSteps`
                                      `or` has (exactly 4) Spades)
                              )
                     `thenAskSteps` [???]
+
+kerrSymmetricRelay :: [RelaySystem] -- responses starting at 1h
+kerrSymmetricRelay = [ tell (hasSuit Hearts) `then` heart
+                     , tell (hasSuit Spades) `then` oneMajor
+                     , tell balanced `then` notrump
+                     , tell (hasSuit Clubs) `then` club
+                     , tell (hasSuit Diamonds) `then` singleSuited
+                     ] `zoomTo` ((tell $ hasSuit Clubs `and` hasSuit Diamonds) `then` twoSuited)
+  where heart = [ tell (hasSuit Spades) `then` bothMajors
+                ] `zoomTo` oneMajor
+        oneMajor = [ tell (hasSuit Clubs) `then` twoSuited
+                   , tell (hasSuit Diamonds `and` reverser) `zoomTo` resolvedShortLegged
+                   ] `zoomTo` singleSuited
+        bothMajors = [threeSuited] `zoomTo` twoSuited
+        notrump = undefined
+        oneSuited = undefined
+        twoSuited = undefined
+        resolvedShortLegged = undefined
+        threeSuited = [ tell (shortage High) `then` resolvedThreeSuited
+                      ] `zoomTo` (tell (shortage Low) `then` resolvedThreeSuited)
+        resolvedThreeSuited = [ tell (pattern 4 4 4 1)
+                              , tell (pattern 4 4 5 0)
+                              , tell (pattern 4 5 4 0)
+                              , tell (pattern 5 4 4 0)
+                              ]
