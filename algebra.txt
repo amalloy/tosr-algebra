@@ -118,3 +118,6 @@ learn :: Knowledge -> RelaySystem -> RelaySystem
 law: "learn/meaning"
 forall (k :: Knowledge) (bids :: [Bid]) (sys :: RelaySystem).
   meaning (learn k sys) bids = combine k (meaning sys bids)
+
+cheapest :: Bid
+above :: Bid -> Bid
