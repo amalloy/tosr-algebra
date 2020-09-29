@@ -126,3 +126,19 @@ forall (k :: Knowledge) (bids :: [Bid]) (sys :: RelaySystem).
 
 cheapest :: Bid
 above :: Bid -> Bid
+
+
+-- maybe not a good example relay, since 3d has multiple followups and relayer gives information too
+puppetStayman :: RelaySystem
+puppetStayman = ask cheapest `thenAnswerSteps`
+                  [ fourCardMajor
+                  , tell $ has (exactly 5) Hearts
+                  , tell $ has (exactly 5) Spades
+                  , tell $ has (atMost 3) Hearts `and` has (atMost 3) Spades
+                  ]
+  where fourCardMajor = tell (      has (atMost 4) Hearts
+                              `and` has (atMost 4) Spades
+                              `and` (     has (exactly 4) Hearts
+                                     `or` has (exactly 4) Spades)
+                             )
+                    `thenAskSteps` [???]
