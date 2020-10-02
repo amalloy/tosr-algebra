@@ -172,6 +172,7 @@ kerrSymmetricRelay = options [ tell (hasSuit Hearts) `then` heart
                                       ]
 
 -- types inspired by kerrSymmetricRelay:
+data RelaySystem
 data Knowledge
 tell :: Knowledge -> RelaySystem
 then :: RelaySystem -> RelaySystem -> RelaySystem
@@ -181,6 +182,7 @@ options :: [RelaySystem] -> RelaySystem
 pattern :: Int -> Int -> Int -> Int -> Knowledge
 
 -- are these really part of the algebra, or user-defined combinators?
+-- some sub-algebra for describing how to combine knowledge about hand shapes?
 data Suit
 clubs, diamonds, hearts, spades :: Suit
 hasSuit :: Suit -> Knowledge
