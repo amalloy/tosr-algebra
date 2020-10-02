@@ -144,27 +144,46 @@ puppetStayman = ask cheapest `thenAnswerSteps`
                              )
                     `thenAskSteps` [???]
 
-kerrSymmetricRelay :: [RelaySystem] -- responses starting at 1h
-kerrSymmetricRelay = [ tell (hasSuit Hearts) `then` heart
-                     , tell (hasSuit Spades) `then` oneMajor
-                     , tell balanced `then` notrump
-                     , tell (hasSuit Clubs) `then` club
-                     , tell (hasSuit Diamonds) `then` singleSuited
-                     ] `zoomTo` ((tell $ hasSuit Clubs `and` hasSuit Diamonds) `then` twoSuited)
-  where heart = [ tell (hasSuit Spades) `then` bothMajors
-                ] `zoomTo` oneMajor
-        oneMajor = [ tell (hasSuit Clubs) `then` twoSuited
-                   , tell (hasSuit Diamonds `and` reverser) `zoomTo` resolvedShortLegged
-                   ] `zoomTo` singleSuited
-        bothMajors = [threeSuited] `zoomTo` twoSuited
-        notrump = undefined
-        oneSuited = undefined
-        twoSuited = undefined
-        resolvedShortLegged = undefined
-        threeSuited = [ tell (shortage High) `then` resolvedThreeSuited
-                      ] `zoomTo` (tell (shortage Low) `then` resolvedThreeSuited)
-        resolvedThreeSuited = [ tell (pattern 4 4 4 1)
-                              , tell (pattern 4 4 5 0)
-                              , tell (pattern 4 5 4 0)
-                              , tell (pattern 5 4 4 0)
-                              ]
+kerrSymmetricRelay :: RelaySystem -- responses starting at 1h
+kerrSymmetricRelay = options [ tell (hasSuit Hearts) `then` heart
+                             , tell (hasSuit Spades) `then` oneMajor
+                             , tell balanced `then` notrump
+                             , tell (hasSuit Clubs) `then` club
+                             , tell (hasSuit Diamonds) `then` singleSuited
+                             ]
+                       `zoomTo` ((tell $ hasSuit Clubs `and` hasSuit Diamonds)
+                                 `then` twoSuited)
+  where heart = (tell (hasSuit Spades) `then` bothMajors)
+                  `zoomTo` oneMajor
+        oneMajor = options [ tell (hasSuit Clubs) `then` twoSuited
+                           , tell (hasSuit Diamonds `and` nonReverse)
+                               `then` nonReverserTwoSuit
+                           , tell (hasSuit Diamonds `and` reverser)
+                               `then` reverserShortLegged
+                           ] `zoomTo` singleSuited
+        bothMajors = threeSuited `zoomTo` twoSuited
+        -- various left undefined
+        threeSuited = (tell (shortage High) `then` resolvedThreeSuited)
+                        `zoomTo` (tell (shortage Low) `then` resolvedThreeSuited)
+        resolvedThreeSuited = options [ tell (pattern 4 4 4 1)
+                                      , tell (pattern 4 4 5 0)
+                                      , tell (pattern 4 5 4 0)
+                                      , tell (pattern 5 4 4 0)
+                                      ]
+
+-- types inspired by kerrSymmetricRelay:
+data Knowledge
+tell :: Knowledge -> RelaySystem
+then :: RelaySystem -> RelaySystem -> RelaySystem
+zoomTo :: RelaySystem -> RelaySystem -> RelaySystem
+and :: Knowledge -> Knowledge -> Knowledge
+options :: [RelaySystem] -> RelaySystem
+pattern :: Int -> Int -> Int -> Int -> Knowledge
+
+-- are these really part of the algebra, or user-defined combinators?
+data Suit
+clubs, diamonds, hearts, spades :: Suit
+hasSuit :: Suit -> Knowledge
+data Shortage
+high, low, even, middle :: Shortage
+shortage :: Shortage -> Knowledge
